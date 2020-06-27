@@ -1,3 +1,12 @@
+GIT
+  remote: git@github.com:edikgat/activerecord-mysql-enum.git
+  revision: c7b60f7b80a5afbb210801240e6b959d85493428
+  branch: rails-5.2
+  specs:
+    activerecord-mysql-enum (0.2.0)
+      activerecord (~> 5.2.0)
+      mysql2 (>= 0.4.4, < 0.6.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -155,6 +164,8 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    record_tag_helper (1.0.1)
+      actionview (>= 5)
     rspec-collection_matchers (1.2.0)
       rspec-expectations (>= 2.99.0.beta1)
     rspec-core (3.9.2)
@@ -242,6 +253,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activerecord-mysql-enum!
   bootsnap (>= 1.1.0)
   bootstrap-generators (~> 3.3.4)
   bootstrap-sass (~> 3.4.1)
@@ -258,6 +270,7 @@ DEPENDENCIES
   pry-rails
   puma (~> 3.11)
   rails (~> 5.2.4, >= 5.2.4.3)
+  record_tag_helper (~> 1.0)
   rspec-collection_matchers
   rspec-rails
   rubocop (~> 0.51.0)

@@ -1,0 +1,37 @@
+<div class="page-header">
+  <%= link_to new_merchant_path, class: 'btn btn-primary' do %>
+    <span class="glyphicon glyphicon-plus"></span>
+    New Merchant
+  <% end %>
+  <h1>Listing merchants</h1>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped table-bordered table-hover">
+    <thead>
+      <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Total transaction sum</th>
+            <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <%= content_tag_for(:tr, @merchants) do |merchant| %>
+            <td><%= merchant.name %></td>
+            <td><%= merchant.description %></td>
+            <td><%= merchant.email %></td>
+            <td><%= merchant.status %></td>
+            <td><%= merchant.total_transaction_sum %></td>
+            <td><%= link_to 'Show', merchant %></td>
+        <td><%= link_to 'Edit', edit_merchant_path(merchant) %></td>
+        <td><%= link_to 'Destroy', merchant, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      <% end %>
+    </tbody>
+  </table>
+</div>

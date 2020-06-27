@@ -1,0 +1,29 @@
+<div class="page-header">
+  <%= link_to merchants_path, class: 'btn btn-default' do %>
+    <span class="glyphicon glyphicon-list-alt"></span>
+    Back
+  <% end %>
+  <%= link_to edit_merchant_path(@merchant), class: 'btn btn-primary' do %>
+    <span class="glyphicon glyphicon-pencil"></span>
+    Edit
+  <% end %>
+  <h1>Show merchant</h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt>Name:</dt>
+  <dd><%= @merchant.name %></dd>
+
+  <dt>Description:</dt>
+  <dd><%= @merchant.description %></dd>
+
+  <dt>Email:</dt>
+  <dd><%= @merchant.email %></dd>
+
+  <dt>Status:</dt>
+  <dd><%= @merchant.status %></dd>
+
+  <dt>Total transaction sum:</dt>
+  <dd><%= @merchant.total_transaction_sum %></dd>
+
+</dl>
