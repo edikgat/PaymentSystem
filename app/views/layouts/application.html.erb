@@ -35,8 +35,15 @@
           <li><a href="#about">About</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
+        <% if admin_signed_in? %>
+          <ul class="nav navbar-nav pull-right">
+            <li><%= link_to('Logout', destroy_admin_session_path, method: :delete) %></li>
+          </ul>
+        <% end %>
       </div>
+
     </div>
+
   </nav>
   <div class="container">
     <% flash.each do |name, msg| %>

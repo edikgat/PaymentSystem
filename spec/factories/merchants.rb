@@ -1,9 +1,10 @@
 FactoryBot.define do
   factory :merchant do
-    name { "MyString" }
-    description { "MyText" }
-    email { "MyString" }
-    status { "" }
-    total_transaction_sum { "9.99" }
+    sequence(:name) { |n| "#{n}_#{Faker::Company.name}" }
+    description { Faker::Lorem.paragraph }
+    sequence(:email) { |n| "#{n}_admin_#{Faker::Internet.email}" }
+    status { :active }
+    total_transaction_sum { 0.0 }
+    sequence(:token) { |n| "token_#{n}" }
   end
 end
