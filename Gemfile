@@ -38,7 +38,7 @@ gem 'bootsnap', '>= 1.1.0', require: false
 gem 'bootstrap-sass', '~> 3.4.1'
 gem 'sassc-rails', '>= 2.1.0'
 gem 'jquery-rails'
-gem 'simple_form', '~> 4.1.0'
+gem 'simple_form', '~> 5.0.0'
 gem 'bootstrap-generators', '~> 3.3.4'
 gem 'activerecord-mysql-enum', git: 'git@github.com:edikgat/activerecord-mysql-enum.git', branch: 'rails-5.2'
 gem 'record_tag_helper', '~> 1.0'
