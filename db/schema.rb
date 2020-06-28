@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_27_202853) do
+ActiveRecord::Schema.define(version: 2020_06_28_160237) do
 
   create_table "merchants", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(version: 2020_06_27_202853) do
     t.decimal "total_transaction_sum", precision: 10, default: "0", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "token", null: false
   end
 
 end
