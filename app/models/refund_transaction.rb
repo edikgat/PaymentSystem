@@ -1,0 +1,2 @@
+class ChargeTransaction < PaymentTransaction
+end
