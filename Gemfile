@@ -42,6 +42,8 @@ gem 'simple_form', '~> 4.1.0'
 gem 'bootstrap-generators', '~> 3.3.4'
 gem 'activerecord-mysql-enum', git: 'git@github.com:edikgat/activerecord-mysql-enum.git', branch: 'rails-5.2'
 gem 'record_tag_helper', '~> 1.0'
+gem 'devise'
+
 # gem 'slim-rails'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
