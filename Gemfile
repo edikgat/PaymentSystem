@@ -44,6 +44,10 @@ gem 'activerecord-mysql-enum', git: 'git@github.com:edikgat/activerecord-mysql-e
 gem 'record_tag_helper', '~> 1.0'
 gem 'devise'
 
+gem 'grape'
+gem 'grape-swagger'
+gem 'grape-swagger-rails'
+gem 'hashie-forbidden_attributes'
 # gem 'slim-rails'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
