@@ -14,6 +14,7 @@ class Api::TransactionsApi < Grape::API
       optional :amount, type: BigDecimal
     end
     post do
+      present PaymentTransaction.last, with: PaymentTransactionPresenter
     end
   end
 end

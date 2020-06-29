@@ -4,9 +4,10 @@ require 'grape-swagger'
 
 class Api::V1 < Grape::API
   prefix :api
-  format :json
-  content_type :json, 'application/json; charset=UTF-8'
+
   default_format :json
+  content_type :xml, 'application/xml; charset=UTF-8'
+  content_type :json, 'application/json; charset=UTF-8'
 
   rescue_from ActiveRecord::RecordNotFound do |e|
     error_response(message: e.message, status: 404)
@@ -32,10 +33,6 @@ class Api::V1 < Grape::API
     def logger
       Rails.logger
     end
-  end
-
-  before do
-    header 'Content-Type', 'application/json; charset=UTF-8'
   end
 
   mount Api::TransactionsApi
