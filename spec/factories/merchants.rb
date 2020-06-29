@@ -5,6 +5,7 @@ FactoryBot.define do
     sequence(:email) { |n| "#{n}_admin_#{Faker::Internet.email}" }
     status { :active }
     total_transaction_sum { 0.0 }
-    sequence(:token) { |n| "token_#{n}" }
+    password { '12345678' }
+    password_confirmation { '12345678' }
   end
 end
