@@ -8,7 +8,7 @@ class Api::TransactionsApi < Grape::API
   resource :transaction do
     desc 'Submitting Transactions'
     params do
-      requires :type, type: String, values: ["AuthorizeTransaction", "ChargeTransaction", "RefundTransaction", "ReversalTransaction"]
+      requires :type, type: Symbol, values: PaymentTransaction::TYPES
       requires :merchant_token, type: String
       optional :uuid, type: String
       optional :amount, type: BigDecimal

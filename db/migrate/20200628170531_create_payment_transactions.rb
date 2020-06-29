@@ -5,7 +5,7 @@ class CreatePaymentTransactions < ActiveRecord::Migration[5.2]
       t.bigint :merchant_id, null: false
       t.bigint :payment_transaction_id
       t.enum :status, limit: [:approved, :reversed, :refunded, :error], null: false
-      t.enum :type, limit: ["AuthorizeTransaction", "ChargeTransaction", "RefundTransaction", "ReversalTransaction"], null: false
+      t.enum :type, limit: [:AuthorizeTransaction, :ChargeTransaction, :RefundTransaction, :ReversalTransaction], null: false
       t.decimal :amount
       t.string :customer_email
       t.string :customer_phone
