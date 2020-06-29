@@ -1,0 +1,9 @@
+default: &default_settings
+  port: 6379
+  host: localhost
+development:
+  <<: *default_settings
+staging:
+  <<: *default_settings
+production:
+  <<: *default_settings
