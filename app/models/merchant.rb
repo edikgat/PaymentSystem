@@ -11,4 +11,6 @@ class Merchant < ApplicationRecord
   validates :email, uniqueness: { case_sensitive: false }, email: true, allow_blank: true
 
   devise :database_authenticatable
+
+  scope :active, -> { where(status: :active) }
 end
