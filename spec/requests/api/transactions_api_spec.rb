@@ -82,7 +82,7 @@ describe Api::TransactionsApi do
             post url,
                  params: {
                    token: token,
-                   transaction: { type: 'AuthorizeTransaction', amount: 10 }
+                   transaction: { type: 'AuthorizeTransaction', amount: 10, customer_email: 'e@mail.com' }
                  }
           end
           it 'access to api' do
@@ -94,7 +94,7 @@ describe Api::TransactionsApi do
             post url,
                  headers: { 'Authorization' => "JWT #{token}" },
                  params: {
-                   transaction: { type: 'AuthorizeTransaction', amount: 10 }
+                   transaction: { type: 'AuthorizeTransaction', amount: 10, customer_email: 'e@mail.com' }
                  }
           end
           it 'access to api' do
@@ -115,7 +115,7 @@ describe Api::TransactionsApi do
           post url,
                params: {
                  token: 'incorrect',
-                 transaction: { type: 'AuthorizeTransaction', amount: 10 }
+                 transaction: { type: 'AuthorizeTransaction', amount: 10, customer_email: 'e@mail.com' }
                }
         end
         it_behaves_like 'unauthorized'
@@ -127,10 +127,112 @@ describe Api::TransactionsApi do
           post url,
                params: {
                  token: token,
-                 transaction: { type: 'AuthorizeTransaction', amount: 10 }
+                 transaction: { type: 'AuthorizeTransaction', amount: 10, customer_email: 'e@mail.com' }
                }
         end
         it_behaves_like 'unauthorized'
+      end
+      context 'inactive merchant' do
+        let!(:resource) do
+          create(
+            :merchant,
+            id: 123,
+            email: 'merchant1@mail.com',
+            password: '123456',
+            password_confirmation: '123456',
+            status: :inactive
+          )
+        end
+        before do
+          post url,
+               params: {
+                 token: token,
+                 transaction: { type: 'AuthorizeTransaction', amount: 10, customer_email: 'e@mail.com' }
+               }
+        end
+        it_behaves_like 'unauthorized'
+      end
+    end
+    context 'AuthorizeTransaction' do
+      context 'all parameters valid' do
+        subject(:http_request) do
+          post url,
+               params: {
+                 token: token,
+                 transaction: {
+                   type: 'AuthorizeTransaction',
+                   amount: 10,
+                   customer_email: 'e@mail.com'
+                 }
+               }
+        end
+        it 'create new transaction' do
+          expect { http_request }
+            .to(change { AuthorizeTransaction.all.reload.count }.from(0).to(1))
+        end
+        it 'return 201 status' do
+          http_request
+          expect(response.status).to(eq(201))
+        end
+        it 'return new transaction info' do
+          SecureRandom.stubs(:uuid).returns('123456')
+          http_request
+          expect(json).to(eql({
+                                'uuid' => '123456',
+                                'type' => 'AuthorizeTransaction',
+                                'status' => 'approved',
+                                'amount' => 10,
+                                'customer_email' => 'e@mail.com',
+                                'merchant_email' => 'merchant1@mail.com'
+                              }))
+        end
+      end
+      shared_examples 'invalid input' do
+        it 'not create new transaction' do
+          expect { http_request }
+            .to_not(change { AuthorizeTransaction.all.reload.count })
+        end
+        it 'return 422 status' do
+          http_request
+          expect(response.status).to(eq(422))
+        end
+      end
+      context 'invalid api parameters' do
+        subject(:http_request) do
+          post url,
+               params: {
+                 token: token,
+                 transaction: {
+                   type: 'invalid',
+                   amount: -10,
+                   customer_email: 'emailcom'
+                 }
+               }
+        end
+        it_behaves_like 'invalid input'
+        it 'return errors' do
+          http_request
+          expect(json).to(eql({ "error" => "transaction[type] does not have a valid value" }))
+        end
+      end
+      context 'invalid instance' do
+        subject(:http_request) do
+          post url,
+               params: {
+                 token: token,
+                 transaction: {
+                   type: 'AuthorizeTransaction',
+                   amount: -10,
+                   customer_email: 'emailcom'
+                 }
+               }
+        end
+        it_behaves_like 'invalid input'
+        it 'return errors' do
+          http_request
+          expect(json).to(eql({ 'error' =>
+            'Validation failed: Customer email has incorrect email format, Amount must be greater than 0' }))
+        end
       end
     end
   end

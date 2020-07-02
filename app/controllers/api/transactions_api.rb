@@ -33,10 +33,20 @@ module Api
           requires :type, type: Symbol, values: PaymentTransaction::TYPES
           optional :uuid, type: String
           optional :amount, type: BigDecimal
+          optional :customer_email, type: String
+          optional :customer_phone, type: String
         end
       end
       post do
-        present current_merchant.payment_transactions.last, with: PaymentTransactionPresenter
+        transaction = AuthorizeTransaction.create!(
+          amount: permitted_params[:transaction][:amount],
+          merchant: current_merchant,
+          uuid: SecureRandom.uuid,
+          status: :approved,
+          customer_email: permitted_params[:transaction][:customer_email],
+          customer_phone: permitted_params[:transaction][:customer_phone]
+        )
+        present transaction, with: PaymentTransactionPresenter
       end
     end
   end
