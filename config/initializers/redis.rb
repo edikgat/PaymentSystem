@@ -1,4 +1,6 @@
-require "redis"
+# frozen_string_literal: true
+
+require('redis')
 
 current_redis_config = YMLConfigReader.fetch(Rails.root.join('config/redis.yml'), Rails.env)
 

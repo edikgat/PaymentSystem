@@ -1,37 +1,42 @@
-class MerchantApiAuth::Authenticator < MerchantApiAuth::Base
-  attr_reader :token
+# frozen_string_literal: true
 
-  def initialize(token)
-    @token = token
-  end
+module MerchantApiAuth
+  class Authenticator < Base
+    attr_reader :token
 
-  def resource
-    @resource ||= begin 
-      if Time.now < expires_in
-        resource_scope.find(resource_id)
-      else
-        false
-      end
-    rescue JWT::DecodeError, NameError, TypeError, ActiveRecord::RecordNotFound
-      false
+    def initialize(token)
+      @token = token
     end
-  end
 
-  private
+    def resource
+      @resource ||=
+        begin
+             if Time.now < expires_in
+               resource_scope.find(resource_id)
+             else
+               false
+             end
+        rescue JWT::DecodeError, NameError, TypeError, ActiveRecord::RecordNotFound
+          false
+           end
+    end
 
-  def payload
-    @payload ||= JWT.decode(token, secret_key, 'HS256')[0]
-  end
+    private
 
-  def resource_scope
-    Merchant.active
-  end
+    def payload
+      @payload ||= JWT.decode(token, secret_key, 'HS256')[0]
+    end
 
-  def resource_id
-    payload['resource_id']
-  end
+    def resource_scope
+      Merchant.active
+    end
 
-  def expires_in
-    Time.at(payload['expires_in'])
+    def resource_id
+      payload['resource_id']
+    end
+
+    def expires_in
+      Time.at(payload['expires_in'])
+    end
   end
 end

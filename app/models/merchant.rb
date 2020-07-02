@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class Merchant < ApplicationRecord
-  STATUSES = %i(active inactive).freeze
+  STATUSES = %i[active inactive].freeze
 
   has_many :payment_transactions, inverse_of: :merchant
 

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class PaymentTransaction < ApplicationRecord
-  TYPES = %i(AuthorizeTransaction ChargeTransaction RefundTransaction ReversalTransaction).freeze
-  STATUSES = %i(approved reversed refunded error).freeze
+  TYPES = %i[AuthorizeTransaction ChargeTransaction RefundTransaction ReversalTransaction].freeze
+  STATUSES = %i[approved reversed refunded error].freeze
 
   belongs_to :merchant
 

@@ -1,6 +1,8 @@
-require 'rails_helper'
+# frozen_string_literal: true
 
-RSpec.describe MerchantApiAuth::Authenticator do
+require('rails_helper')
+
+RSpec.describe(MerchantApiAuth::Authenticator) do
   subject(:authenticator) { described_class.new(token) }
   let(:token) { MerchantApiAuth::TokenCreator.token(resource.id) }
   let(:secret_key) { Rails.application.secrets.secret_key_base.to_s }
@@ -11,28 +13,28 @@ RSpec.describe MerchantApiAuth::Authenticator do
     Timecop.freeze(current_time)
   end
 
-  describe "#resource" do
+  describe '#resource' do
     context 'token valid & resource present & not expires' do
       it 'return resource object' do
-        expect(authenticator.resource).to eql(resource)
+        expect(authenticator.resource).to(eql(resource))
       end
     end
     context 'other resource' do
       let!(:resource) { create(:admin, id: 321) }
       it 'return resource object' do
-        expect(authenticator.resource).to eql(false)
+        expect(authenticator.resource).to(eql(false))
       end
     end
     context 'merchant inactive' do
       let!(:resource) { create(:merchant, id: 123, status: :inactive) }
       it 'return false' do
-        expect(authenticator.resource).to eql(false)
+        expect(authenticator.resource).to(eql(false))
       end
     end
     context 'token invalid' do
       let(:token) { 'invalid' }
       it 'return false' do
-        expect(authenticator.resource).to eql(false)
+        expect(authenticator.resource).to(eql(false))
       end
     end
     context 'resource removed' do
@@ -41,7 +43,7 @@ RSpec.describe MerchantApiAuth::Authenticator do
         resource.destroy
       end
       it 'return false' do
-        expect(authenticator.resource).to eql(false)
+        expect(authenticator.resource).to(eql(false))
       end
     end
     context '+ 5 hours' do
@@ -50,7 +52,7 @@ RSpec.describe MerchantApiAuth::Authenticator do
         Timecop.freeze(current_time + 5.hours)
       end
       it 'return false' do
-        expect(authenticator.resource).to eql(false)
+        expect(authenticator.resource).to(eql(false))
       end
     end
     context '+ 3 hours' do
@@ -59,7 +61,7 @@ RSpec.describe MerchantApiAuth::Authenticator do
         Timecop.freeze(current_time + 3.hours)
       end
       it 'return resource' do
-        expect(authenticator.resource).to eql(resource)
+        expect(authenticator.resource).to(eql(resource))
       end
     end
   end

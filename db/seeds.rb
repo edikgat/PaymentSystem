@@ -1,6 +1,8 @@
-require 'factory_bot_rails'
+# frozen_string_literal: true
 
-Admin.create!(email: 'admin@test.com', password: 12345678, password_confirmation: 12345678)
+require('factory_bot_rails')
+
+Admin.create!(email: 'admin@test.com', password: 12_345_678, password_confirmation: 12_345_678)
 FactoryBot.create_list(:merchant, 5).each do |merchant|
   FactoryBot.create_list(:payment_transaction, 3, merchant: merchant)
 end

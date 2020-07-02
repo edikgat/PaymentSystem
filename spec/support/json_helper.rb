@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module JsonHelper
   def json
     @json ||= JSON.parse(response.body)
@@ -5,5 +7,5 @@ module JsonHelper
 end
 
 RSpec.configure do |config|
-  config.include JsonHelper, type: :request
+  config.include(JsonHelper, type: :request)
 end

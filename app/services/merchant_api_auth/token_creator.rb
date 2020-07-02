@@ -1,24 +1,31 @@
-class MerchantApiAuth::TokenCreator < MerchantApiAuth::Base
-  ACTIVITY_PERIOD = 4.hours
+# frozen_string_literal: true
 
-  attr_reader :resource_id
+module MerchantApiAuth
+  class TokenCreator < Base
+    ACTIVITY_PERIOD = 4.hours
+    private_constant :ACTIVITY_PERIOD
 
-  def self.token(resource_id)
-    new(resource_id).token
-  end
+    attr_reader :resource_id
 
-  def initialize(resource_id)
-    @resource_id = resource_id
-  end
+    def self.token(resource_id)
+      new(resource_id).token
+    end
 
-  def token
-    JWT.encode(payload, secret_key, 'HS256')
-  end
+    def initialize(resource_id)
+      @resource_id = resource_id
+    end
 
-  private
+    def token
+      JWT.encode(payload, secret_key, 'HS256')
+    end
 
-  def payload
-    {resource_id: resource_id,
-     expires_in: (Time.now + ACTIVITY_PERIOD).to_i}
+    private
+
+    def payload
+      {
+        resource_id: resource_id,
+        expires_in: (Time.now + ACTIVITY_PERIOD).to_i
+      }
+    end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PaymentTransactionPresenter < Grape::Entity
   expose :uuid
   expose :type

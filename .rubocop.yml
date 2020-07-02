@@ -1,0 +1,94 @@
+AllCops:
+  EnabledByDefault: true
+  Exclude:
+    - 'config/initializers/simple_form_bootstrap.rb'
+    - 'db/schema.rb'
+    - 'spec/requests/merchants_spec.rb'
+    - 'spec/requests/payment_transactions_spec.rb'
+
+Layout/EmptyLinesAroundBlockBody:
+  Exclude:
+    - 'db/schema.rb'
+
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+
+Metrics/BlockLength:
+  Max: 30
+  Exclude:
+    - 'db/schema.rb'
+    - 'spec/**/*'
+
+Metrics/MethodLength:
+  Max: 30
+
+Style/GlobalVars:
+  Enabled: true
+  Exclude:
+    - 'config/initializers/redis.rb'
+
+Style/MissingElse:
+  Enabled: true
+  Exclude:
+    - 'config/boot.rb'
+    - 'config/environments/production.rb'
+    - 'bin/spring'
+
+Style/InlineComment:
+  Enabled: true
+  Exclude:
+    - 'config/boot.rb'
+
+Style/DocumentationMethod:
+  Enabled: false
+
+Security/YAMLLoad:
+  Enabled: true
+  Exclude:
+   - 'app/services/yml_config_reader.rb'
+
+Style/ConstantVisibility:
+  Enabled: false
+
+Bundler/GemComment:
+  Enabled: false
+
+Style/Copyright:
+  Enabled: false
+
+Lint/ConstantResolution:
+  Enabled: false
+
+Lint/NumberConversion:
+  Enabled: false
+
+Style/StringHashKeys:
+  Exclude:
+    - 'db/schema.rb'
+    - 'spec/**/*'
+
+Style/Documentation:
+  Enabled: false
+
+Style/MixinUsage:
+  Exclude:
+    - 'bin/setup'
+    - 'bin/update'
+
+Style/SymbolArray:
+  Exclude:
+    - 'db/schema.rb'
+
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - 'config/initializers/devise.rb'
+
+Metrics/CyclomaticComplexity:
+  Max: 8
+
+Metrics/PerceivedComplexity:
+  Max: 8
+
+Metrics/AbcSize:
+  Max: 17
