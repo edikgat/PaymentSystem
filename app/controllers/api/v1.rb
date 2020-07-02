@@ -5,9 +5,9 @@ require 'grape-swagger'
 class Api::V1 < Grape::API
   prefix :api
 
-  default_format :json
-  content_type :xml, 'application/xml; charset=UTF-8'
-  content_type :json, 'application/json; charset=UTF-8'
+  format :json
+  content_type :json, "application/json"
+  content_type :xml, "application/xml"
 
   rescue_from ActiveRecord::RecordNotFound do |e|
     error_response(message: e.message, status: 404)
@@ -36,6 +36,7 @@ class Api::V1 < Grape::API
   end
 
   mount Api::TransactionsApi
+  mount Api::Auth
 
   add_swagger_documentation(
     api_version: 'v1',

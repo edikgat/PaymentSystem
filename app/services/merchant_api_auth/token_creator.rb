@@ -18,7 +18,7 @@ class MerchantApiAuth::TokenCreator < MerchantApiAuth::Base
   private
 
   def payload
-    {resource_id: resource_id, 
+    {resource_id: resource_id,
      expires_in: (Time.now + ACTIVITY_PERIOD).to_i}
   end
 end
