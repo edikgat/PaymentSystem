@@ -38,8 +38,10 @@ module Api
         end
       end
       post do
-        service = TransactionCreation::AuthorizeTransactionCreator
-                  .new(permitted_params[:transaction].merge({ merchant_id: current_merchant.id }))
+        service = TransactionCreation::Strategy
+                  .new(type: permitted_params[:transaction][:type],
+                       params: permitted_params[:transaction],
+                       merchant: current_merchant)
         status(422) unless service.create
         present(service, with: TransactionCreationPresenter)
       end

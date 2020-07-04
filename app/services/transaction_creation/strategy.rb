@@ -1,16 +1,23 @@
 # frozen_string_literal: true
 
 module TransactionCreation
-  class AuthorizeTransactionCreator < Base
-    attr_reader :params, :error
+  class Strategy
+    attr_reader :params, :error, :merchant, :type
 
-    def initialize(params)
+    def initialize(type:, params:, merchant:)
       @params = params
+      @merchant = merchant
+      @type = type
+    end
+
+    def form
+      @form ||= form_class.new(params, merchant)
     end
 
     def create
       in_transaction do
         if form.valid?
+          form.process_success
         else
           form.set_error
           @error = form.error
@@ -19,14 +26,10 @@ module TransactionCreation
       end
     end
 
-    def form
-      @form ||= form_class.new(params)
-    end
-
     private
 
     def form_class
-      AuthorizeTransactionForm
+      "TransactionCreation::#{type}Form".constantize
     end
 
     def in_transaction

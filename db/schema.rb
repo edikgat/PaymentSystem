@@ -39,7 +39,7 @@ ActiveRecord::Schema.define(version: 2020_06_28_170531) do
   create_table "payment_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.bigint "merchant_id", null: false
-    t.bigint "payment_transaction_id"
+    t.bigint "parent_payment_transaction_id"
     t.enum "status", limit: [:approved, :reversed, :refunded, :error], default: :approved, null: false
     t.enum "type", limit: [:AuthorizeTransaction, :ChargeTransaction, :RefundTransaction, :ReversalTransaction], null: false
     t.decimal "amount", precision: 10
@@ -48,10 +48,10 @@ ActiveRecord::Schema.define(version: 2020_06_28_170531) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["merchant_id"], name: "fk_rails_63c2dffe82"
-    t.index ["payment_transaction_id"], name: "fk_rails_cd4c2d6004"
+    t.index ["parent_payment_transaction_id"], name: "fk_rails_41d0b0da7b"
     t.index ["uuid"], name: "index_payment_transactions_on_uuid", unique: true
   end
 
   add_foreign_key "payment_transactions", "merchants"
-  add_foreign_key "payment_transactions", "payment_transactions"
+  add_foreign_key "payment_transactions", "payment_transactions", column: "parent_payment_transaction_id"
 end

@@ -3,7 +3,7 @@
 require('rails_helper')
 
 describe Api::TransactionsApi do
-  let!(:resource) do
+  let!(:merchant) do
     create(
       :merchant,
       id: 123,
@@ -16,6 +16,7 @@ describe Api::TransactionsApi do
   let(:secret_key) { Rails.application.secrets.secret_key_base.to_s }
 
   before do
+    SecureRandom.stubs(:uuid).returns('123456')
     Timecop.freeze(current_time)
   end
 
@@ -74,7 +75,7 @@ describe Api::TransactionsApi do
   end
   describe 'POST /api/v1/transaction' do
     let(:url) { '/api/v1/transaction' }
-    let(:token) { MerchantApiAuth::TokenCreator.token(resource.id) }
+    let(:token) { MerchantApiAuth::TokenCreator.token(merchant.id) }
     context 'authentication' do
       context 'correct token' do
         context 'in parameters hash' do
@@ -133,7 +134,7 @@ describe Api::TransactionsApi do
         it_behaves_like 'unauthorized'
       end
       context 'inactive merchant' do
-        let!(:resource) do
+        let!(:merchant) do
           create(
             :merchant,
             id: 123,
@@ -153,44 +154,52 @@ describe Api::TransactionsApi do
         it_behaves_like 'unauthorized'
       end
     end
-    context 'AuthorizeTransaction' do
-      context 'all parameters valid' do
-        subject(:http_request) do
-          post url,
-               params: {
-                 token: token,
-                 transaction: {
-                   type: 'AuthorizeTransaction',
-                   amount: 10,
-                   customer_email: 'e@mail.com'
-                 }
+    context 'PaymentTransaction' do
+      subject(:http_request) do
+        post url,
+             params: {
+               token: token,
+               transaction: {
+                 type: 'AuthorizeTransaction',
+                 amount: 10,
+                 customer_email: 'e@mail.com'
                }
+             }
+      end
+      shared_examples 'returns 422 status' do
+        it do
+          http_request
+          expect(response.status).to(eq(422))
         end
-        it 'creates new transaction' do
-          expect { http_request }
-            .to(change { AuthorizeTransaction.all.reload.count }.by(1))
+      end
+      shared_examples 'returns 404 status' do
+        it do
+          http_request
+          expect(response.status).to(eq(404))
         end
-        it 'returns 201 status' do
+      end
+      shared_examples 'returns 201 status' do
+        it do
           http_request
           expect(response.status).to(eq(201))
         end
-        it 'return new transaction info' do
-          SecureRandom.stubs(:uuid).returns('123456')
-          http_request
-          expect(json).to(eql({ 'transaction' => {
-                                'uuid' => '123456',
-                                'type' => 'AuthorizeTransaction',
-                                'status' => 'approved',
-                                'amount' => 10,
-                                'customer_email' => 'e@mail.com',
-                                'merchant_email' => 'merchant1@mail.com'
-                              } }))
+      end
+      shared_examples 'not creates new transaction' do |transaction_scope|
+        it do
+          expect { http_request }
+            .to_not(change { transaction_scope.reload.count })
         end
       end
-      shared_examples 'returns 422 status' do
-        it 'returns 422 status' do
-          http_request
-          expect(response.status).to(eq(422))
+      shared_examples 'creates new transaction' do |transaction_scope|
+        it do
+          expect { http_request }
+            .to(change { transaction_scope.reload.count }.by(1))
+        end
+      end
+      shared_examples "to not change merchant's total_transaction_sum" do
+        it do
+          expect { http_request }
+            .to_not(change { merchant.reload.total_transaction_sum })
         end
       end
       context 'invalid api parameters' do
@@ -211,38 +220,205 @@ describe Api::TransactionsApi do
           expect(json).to(eql({ 'error' => 'transaction[type] does not have a valid value' }))
         end
       end
-      context 'invalid instance' do
-        subject(:http_request) do
-          post url,
-               params: {
-                 token: token,
-                 transaction: {
-                   type: 'AuthorizeTransaction',
-                   amount: -10,
-                   customer_email: 'emailcom'
+      context 'AuthorizeTransaction' do
+        context 'all parameters valid' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     type: 'AuthorizeTransaction',
+                     amount: 10,
+                     customer_email: 'e@mail.com'
+                   }
                  }
-               }
+          end
+          it_behaves_like "to not change merchant's total_transaction_sum"
+          it_behaves_like 'creates new transaction', AuthorizeTransaction.all
+          it_behaves_like 'returns 201 status'
+          it 'return new transaction info' do
+            http_request
+            expect(json).to(eql({ 'transaction' => {
+                                  'uuid' => '123456',
+                                  'type' => 'AuthorizeTransaction',
+                                  'status' => 'approved',
+                                  'amount' => 10,
+                                  'customer_email' => 'e@mail.com',
+                                  'merchant_email' => 'merchant1@mail.com'
+                                } }))
+          end
         end
-        it_behaves_like 'returns 422 status'
-        it 'creates new transaction' do
-          expect { http_request }
-            .to(change { AuthorizeTransaction.all.reload.count }.by(1))
+        context 'invalid instance' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     type: 'AuthorizeTransaction',
+                     amount: -10,
+                     customer_email: 'emailcom'
+                   }
+                 }
+          end
+          it_behaves_like 'returns 422 status'
+          it_behaves_like 'creates new transaction', AuthorizeTransaction.all
+          it 'return errors' do
+            http_request
+            expect(json).to(eql({
+                                  'transaction' =>
+                                              {
+                                                'uuid' => '123456',
+                                                'type' => 'AuthorizeTransaction',
+                                                'status' => 'error',
+                                                'amount' => -10,
+                                                'customer_email' => 'emailcom',
+                                                'merchant_email' => 'merchant1@mail.com'
+                                              },
+                                  'error' => 'Customer email has incorrect email format, Amount must be greater than 0'
+                                }))
+          end
         end
-        it 'return errors' do
-          SecureRandom.stubs(:uuid).returns('123456')
-          http_request
-          expect(json).to(eql({
-                                'transaction' =>
-                                            {
-                                              'uuid' => '123456',
-                                              'type' => 'AuthorizeTransaction',
-                                              'status' => 'error',
-                                              'amount' => -10,
-                                              'customer_email' => 'emailcom',
-                                              'merchant_email' => 'merchant1@mail.com'
-                                            },
-                                'error' => 'Customer email has incorrect email format, Amount must be greater than 0'
-                              }))
+      end
+      context 'ChargeTransaction' do
+        let(:authorize_transaction) do
+          create(
+            :authorize_transaction,
+            uuid: 'auth123',
+            amount: 10.0,
+            merchant: merchant,
+            customer_phone: '123456',
+            customer_email: 'cust@mail.com'
+          )
+        end
+        context 'all parameters valid' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     uuid: 'auth123',
+                     type: 'ChargeTransaction',
+                     amount: 5
+                   }
+                 }
+          end
+          before do
+            authorize_transaction
+          end
+          it 'add amount to merchant' do
+            expect { http_request }
+              .to(change { merchant.reload.total_transaction_sum }.by(5))
+          end
+          it_behaves_like 'creates new transaction', ChargeTransaction.all
+          it_behaves_like 'returns 201 status'
+          it 'return new transaction info' do
+            http_request
+            expect(json).to(eql({ 'transaction' =>
+              {
+                'uuid' => '123456',
+                'type' => 'ChargeTransaction',
+                'status' => 'approved',
+                'amount' => 5,
+                'customer_email' => 'cust@mail.com',
+                'customer_phone' => '123456',
+                'merchant_email' => 'merchant1@mail.com'
+              } }))
+          end
+        end
+
+        context 'not present uuid' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     uuid: 'not_present',
+                     type: 'ChargeTransaction',
+                     amount: -10
+                   }
+                 }
+          end
+          before do
+            authorize_transaction
+          end
+          it_behaves_like "to not change merchant's total_transaction_sum"
+          it_behaves_like 'returns 404 status'
+          it_behaves_like 'not creates new transaction', ChargeTransaction.all
+          it 'return error message' do
+            http_request
+            expect(json).to(eql({ 'error' => 'record not present' }))
+          end
+        end
+        context '> auth amount' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     uuid: 'auth123',
+                     type: 'ChargeTransaction',
+                     amount: 100
+                   }
+                 }
+          end
+          before do
+            authorize_transaction
+          end
+          it_behaves_like "to not change merchant's total_transaction_sum"
+          it_behaves_like 'returns 422 status'
+          it_behaves_like 'creates new transaction', ChargeTransaction.all
+          it 'return errors' do
+            http_request
+            expect(json)
+              .to(eql({
+                        'transaction' =>
+                                      {
+                                        'uuid' => '123456',
+                                        'type' => 'ChargeTransaction',
+                                        'status' => 'error',
+                                        'amount' => 100,
+                                        'customer_email' => 'cust@mail.com',
+                                        'customer_phone' => '123456',
+                                        'merchant_email' => 'merchant1@mail.com'
+                                      },
+                        'error' => 'Amount sum of change should be less than or equal to users blocked amount = 10'
+                      }))
+          end
+        end
+        context 'invalid instance' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     uuid: 'auth123',
+                     type: 'ChargeTransaction',
+                     amount: -10
+                   }
+                 }
+          end
+          before do
+            authorize_transaction
+          end
+          it_behaves_like "to not change merchant's total_transaction_sum"
+          it_behaves_like 'returns 422 status'
+          it_behaves_like 'creates new transaction', ChargeTransaction.all
+          it 'return errors' do
+            http_request
+            expect(json).to(eql({
+                                  'transaction' =>
+                                    {
+                                      'uuid' => '123456',
+                                      'type' => 'ChargeTransaction',
+                                      'status' => 'error',
+                                      'amount' => -10,
+                                      'customer_email' => 'cust@mail.com',
+                                      'customer_phone' => '123456',
+                                      'merchant_email' => 'merchant1@mail.com'
+                                    },
+                                  'error' => 'Amount must be greater than 0'
+                                }))
+          end
         end
       end
     end

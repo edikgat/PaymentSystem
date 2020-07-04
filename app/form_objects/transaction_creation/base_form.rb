@@ -4,7 +4,13 @@ module TransactionCreation
   class BaseForm
     include ActiveModel::Validations
 
-    attr_reader :payment_transaction
+    attr_reader :payment_transaction, :merchant, :params
+
+    def initialize(params, merchant)
+      @merchant = merchant
+      @params = params
+      build_payment_transaction
+    end
 
     def error
       errors.full_messages.join(', ')
@@ -14,7 +20,27 @@ module TransactionCreation
       payment_transaction.error!
     end
 
+    def save
+      payment_transaction.save!
+    end
+
+    def process_success
+      raise(NotImplementedError, 'not implemented')
+    end
+
     private
+
+    def build_payment_transaction
+      raise(NotImplementedError, 'not implemented')
+    end
+
+    def sanitized_params
+      params.slice(*supported_params)
+    end
+
+    def supported_params
+      raise(NotImplementedError, 'not implemented')
+    end
 
     def generate_uuid
       10.times do

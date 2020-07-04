@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# frozen_string_literal: true
 
 module TransactionCreation
   class AuthorizeTransactionForm < BaseForm
@@ -13,14 +12,19 @@ module TransactionCreation
 
     delegate :customer_email, :customer_phone, :amount, :persisted?, to: :payment_transaction
 
-    def initialize(params)
+    def process_success; end
+
+    private
+
+    def build_payment_transaction
       @payment_transaction = AuthorizeTransaction.new
-      @payment_transaction.assign_attributes(params)
+      @payment_transaction.merchant = merchant
+      @payment_transaction.assign_attributes(sanitized_params)
       @payment_transaction.uuid = generate_uuid
     end
 
-    def save
-      payment_transaction.save!
+    def supported_params
+      %i[customer_email customer_phone amount]
     end
   end
 end

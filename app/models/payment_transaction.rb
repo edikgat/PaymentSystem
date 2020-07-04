@@ -10,6 +10,8 @@ class PaymentTransaction < ApplicationRecord
   validates :type, inclusion: { in: TYPES }
   validates :uuid, presence: true
 
+  scope :approved, -> { where(status: :approved) }
+
   class << self
     def find_sti_class(type_name)
       ActiveSupport::Dependencies.constantize(type_name)
