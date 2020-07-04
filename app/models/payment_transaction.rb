@@ -8,9 +8,7 @@ class PaymentTransaction < ApplicationRecord
 
   validates :status, inclusion: { in: STATUSES }
   validates :type, inclusion: { in: TYPES }
-  validates :customer_email, email: true, allow_blank: true
-  validates :customer_email, presence: true
-  validates :customer_phone, length: { minimum: 5, maximum: 20 }, allow_blank: true
+  validates :uuid, presence: true
 
   class << self
     def find_sti_class(type_name)

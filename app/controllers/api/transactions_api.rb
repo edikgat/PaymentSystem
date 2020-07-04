@@ -38,15 +38,10 @@ module Api
         end
       end
       post do
-        transaction = AuthorizeTransaction.create!(
-          amount: permitted_params[:transaction][:amount],
-          merchant: current_merchant,
-          uuid: SecureRandom.uuid,
-          status: :approved,
-          customer_email: permitted_params[:transaction][:customer_email],
-          customer_phone: permitted_params[:transaction][:customer_phone]
-        )
-        present transaction, with: PaymentTransactionPresenter
+        service = TransactionCreation::AuthorizeTransactionCreator
+                  .new(permitted_params[:transaction].merge({ merchant_id: current_merchant.id }))
+        status(422) unless service.create
+        present(service, with: TransactionCreationPresenter)
       end
     end
   end

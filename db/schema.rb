@@ -40,7 +40,7 @@ ActiveRecord::Schema.define(version: 2020_06_28_170531) do
     t.string "uuid", limit: 36, null: false
     t.bigint "merchant_id", null: false
     t.bigint "payment_transaction_id"
-    t.enum "status", limit: [:approved, :reversed, :refunded, :error], null: false
+    t.enum "status", limit: [:approved, :reversed, :refunded, :error], default: :approved, null: false
     t.enum "type", limit: [:AuthorizeTransaction, :ChargeTransaction, :RefundTransaction, :ReversalTransaction], null: false
     t.decimal "amount", precision: 10
     t.string "customer_email"

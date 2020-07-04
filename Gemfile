@@ -53,6 +53,7 @@ gem('grape-swagger-rails')
 gem('hashie-forbidden_attributes')
 gem('redis', '~>3.2')
 gem('redis-namespace')
+gem('state_machine')
 # gem 'slim-rails'
 gem('jwt')
 group :development, :test do

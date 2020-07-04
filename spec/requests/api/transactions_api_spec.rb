@@ -58,7 +58,7 @@ describe Api::TransactionsApi do
                merchant: { email: 'notPresentmerchant1@mail.com', password: '123456' }
              }
       end
-      it 'return 422 status' do
+      it 'returns 422 status' do
         expect(response.status).to(eq(422))
       end
       it 'has error message' do
@@ -103,10 +103,10 @@ describe Api::TransactionsApi do
         end
       end
       shared_examples 'unauthorized' do
-        it 'return authtorized' do
+        it 'returns authtorized' do
           expect(response.status).to(eq(401))
         end
-        it 'return error' do
+        it 'returns error' do
           expect(json).to(eq({ 'error' => 'Unauthorized' }))
         end
       end
@@ -166,33 +166,29 @@ describe Api::TransactionsApi do
                  }
                }
         end
-        it 'create new transaction' do
+        it 'creates new transaction' do
           expect { http_request }
-            .to(change { AuthorizeTransaction.all.reload.count }.from(0).to(1))
+            .to(change { AuthorizeTransaction.all.reload.count }.by(1))
         end
-        it 'return 201 status' do
+        it 'returns 201 status' do
           http_request
           expect(response.status).to(eq(201))
         end
         it 'return new transaction info' do
           SecureRandom.stubs(:uuid).returns('123456')
           http_request
-          expect(json).to(eql({
+          expect(json).to(eql({ 'transaction' => {
                                 'uuid' => '123456',
                                 'type' => 'AuthorizeTransaction',
                                 'status' => 'approved',
                                 'amount' => 10,
                                 'customer_email' => 'e@mail.com',
                                 'merchant_email' => 'merchant1@mail.com'
-                              }))
+                              } }))
         end
       end
-      shared_examples 'invalid input' do
-        it 'not create new transaction' do
-          expect { http_request }
-            .to_not(change { AuthorizeTransaction.all.reload.count })
-        end
-        it 'return 422 status' do
+      shared_examples 'returns 422 status' do
+        it 'returns 422 status' do
           http_request
           expect(response.status).to(eq(422))
         end
@@ -209,10 +205,10 @@ describe Api::TransactionsApi do
                  }
                }
         end
-        it_behaves_like 'invalid input'
+        it_behaves_like 'returns 422 status'
         it 'return errors' do
           http_request
-          expect(json).to(eql({ "error" => "transaction[type] does not have a valid value" }))
+          expect(json).to(eql({ 'error' => 'transaction[type] does not have a valid value' }))
         end
       end
       context 'invalid instance' do
@@ -227,11 +223,26 @@ describe Api::TransactionsApi do
                  }
                }
         end
-        it_behaves_like 'invalid input'
+        it_behaves_like 'returns 422 status'
+        it 'creates new transaction' do
+          expect { http_request }
+            .to(change { AuthorizeTransaction.all.reload.count }.by(1))
+        end
         it 'return errors' do
+          SecureRandom.stubs(:uuid).returns('123456')
           http_request
-          expect(json).to(eql({ 'error' =>
-            'Validation failed: Customer email has incorrect email format, Amount must be greater than 0' }))
+          expect(json).to(eql({
+                                'transaction' =>
+                                            {
+                                              'uuid' => '123456',
+                                              'type' => 'AuthorizeTransaction',
+                                              'status' => 'error',
+                                              'amount' => -10,
+                                              'customer_email' => 'emailcom',
+                                              'merchant_email' => 'merchant1@mail.com'
+                                            },
+                                'error' => 'Customer email has incorrect email format, Amount must be greater than 0'
+                              }))
         end
       end
     end
