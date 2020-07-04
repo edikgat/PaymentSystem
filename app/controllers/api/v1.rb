@@ -22,6 +22,10 @@ module Api
       error_response(message: e.message, status: 422)
     end
 
+    rescue_from ActiveRecord::StaleObjectError do |_e|
+      error_response(message: 'Conflict with other change, please try it one more time', status: 412)
+    end
+
     rescue_from StandardError do |_e|
       error_response(message: 'problem at server side, please try it one more time', status: 500)
     end

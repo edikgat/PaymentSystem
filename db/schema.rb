@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 2020_06_28_170531) do
     t.enum "status", limit: [:active, :inactive], default: :active, null: false
     t.decimal "total_transaction_sum", precision: 10, default: "0", null: false
     t.string "encrypted_password", default: "", null: false
+    t.bigint "lock_version", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_merchants_on_email", unique: true
@@ -45,6 +46,7 @@ ActiveRecord::Schema.define(version: 2020_06_28_170531) do
     t.decimal "amount", precision: 10
     t.string "customer_email"
     t.string "customer_phone"
+    t.integer "lock_version", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["merchant_id"], name: "fk_rails_63c2dffe82"

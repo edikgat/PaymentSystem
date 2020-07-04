@@ -20,6 +20,7 @@ class CreatePaymentTransactions < ActiveRecord::Migration[5.2]
       t.decimal(:amount)
       t.string(:customer_email)
       t.string(:customer_phone)
+      t.integer(:lock_version, null: false)
 
       t.timestamps
     end

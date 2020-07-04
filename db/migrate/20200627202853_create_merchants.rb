@@ -9,6 +9,7 @@ class CreateMerchants < ActiveRecord::Migration[5.2]
       t.enum(:status, limit: %i[active inactive], default: :active, null: false)
       t.decimal(:total_transaction_sum, null: false, default: 0.0)
       t.string(:encrypted_password, null: false, default: '')
+      t.bigint(:lock_version, null: false)
       t.timestamps
     end
 
