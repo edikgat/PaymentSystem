@@ -7,6 +7,7 @@ describe Api::TransactionsApi do
     create(
       :merchant,
       id: 123,
+      total_transaction_sum: 10,
       email: 'merchant1@mail.com',
       password: '123456',
       password_confirmation: '123456'
@@ -208,6 +209,12 @@ describe Api::TransactionsApi do
             .to_not(change { authorize_transaction.reload.status })
         end
       end
+      shared_examples 'to not change ChargeTransaction status' do
+        it do
+          expect { http_request }
+            .to_not(change { charge_transaction.reload.status })
+        end
+      end
       context 'invalid api parameters' do
         subject(:http_request) do
           post url,
@@ -240,7 +247,7 @@ describe Api::TransactionsApi do
                  }
           end
           it_behaves_like "to not change merchant's total_transaction_sum"
-          it_behaves_like 'creates new transaction', AuthorizeTransaction.all
+          it_behaves_like 'creates new transaction', AuthorizeTransaction.approved
           it_behaves_like 'returns 201 status'
           it 'return new transaction info' do
             http_request
@@ -316,7 +323,7 @@ describe Api::TransactionsApi do
               .to(change { merchant.reload.total_transaction_sum }.by(5))
           end
           it_behaves_like 'to not change AuthorizeTransaction status'
-          it_behaves_like 'creates new transaction', ChargeTransaction.all
+          it_behaves_like 'creates new transaction', ChargeTransaction.approved
           it_behaves_like 'returns 201 status'
           it 'return new transaction info' do
             http_request
@@ -400,11 +407,23 @@ describe Api::TransactionsApi do
             authorize_transaction.reverse!
           end
           it_behaves_like "to not change merchant's total_transaction_sum"
-          it_behaves_like 'returns 404 status'
-          it_behaves_like 'not creates new transaction', ChargeTransaction.all
-          it 'return error message' do
+          it_behaves_like 'returns 422 status'
+          it_behaves_like 'creates new transaction', ChargeTransaction.all
+          it 'return transaction with error' do
             http_request
-            expect(json).to(eql({ 'error' => 'record not present' }))
+            expect(json).to(eql({
+                                  'transaction' =>
+                                                {
+                                                  'uuid' => '123456',
+                                                  'type' => 'ChargeTransaction',
+                                                  'status' => 'error',
+                                                  'amount' => 5,
+                                                  'customer_email' => 'cust@mail.com',
+                                                  'customer_phone' => '123456',
+                                                  'merchant_email' => 'merchant1@mail.com'
+                                                },
+                                  'error' => 'Authorize transaction status of parent transaction should be approved'
+                                }))
           end
         end
         context "total > authorize transaction's amount" do
@@ -509,7 +528,7 @@ describe Api::TransactionsApi do
               .to(change { authorize_transaction.reload.status }.from(:approved).to(:reversed))
           end
           it_behaves_like "to not change merchant's total_transaction_sum"
-          it_behaves_like 'creates new transaction', ReversalTransaction.all
+          it_behaves_like 'creates new transaction', ReversalTransaction.approved
           it_behaves_like 'returns 201 status'
           it 'return new transaction info' do
             http_request
@@ -590,11 +609,211 @@ describe Api::TransactionsApi do
             authorize_transaction.reverse!
           end
           it_behaves_like "to not change merchant's total_transaction_sum"
+          it_behaves_like 'returns 422 status'
+          it_behaves_like 'creates new transaction', ReversalTransaction.all
+          it 'return error message' do
+            http_request
+            expect(json).to(eql({
+                                  'transaction' =>
+                                                {
+                                                  'uuid' => '123456',
+                                                  'type' => 'ReversalTransaction',
+                                                  'status' => 'error',
+                                                  'customer_email' => 'cust@mail.com',
+                                                  'customer_phone' => '123456',
+                                                  'merchant_email' => 'merchant1@mail.com'
+                                                },
+                                  'error' => 'Authorize transaction status of parent transaction should be approved'
+                                }))
+          end
+        end
+      end
+      context 'RefundTransaction' do
+        let(:authorize_transaction) do
+          create(
+            :authorize_transaction,
+            uuid: 'auth123',
+            amount: 10.0,
+            merchant: merchant,
+            customer_phone: '123456',
+            customer_email: 'cust@mail.com'
+          )
+        end
+        let(:charge_transaction) do
+          create(
+            :charge_transaction,
+            authorize_transaction: authorize_transaction,
+            uuid: 'charge123',
+            amount: 10.0,
+            merchant: merchant,
+            customer_phone: '123456',
+            customer_email: 'cust@mail.com'
+          )
+        end
+        context 'all parameters valid' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     uuid: 'charge123',
+                     type: 'RefundTransaction',
+                     amount: 10
+                   }
+                 }
+          end
+          before do
+            charge_transaction
+          end
+          it 'remove amount from merchant' do
+            expect { http_request }
+              .to(change { merchant.reload.total_transaction_sum }.by(-10))
+          end
+          it 'changes charge_transaction status' do
+            expect { http_request }
+              .to(change { charge_transaction.reload.status }.from(:approved).to(:refunded))
+          end
+          it_behaves_like 'to not change AuthorizeTransaction status'
+          it_behaves_like 'creates new transaction', RefundTransaction.approved
+          it_behaves_like 'returns 201 status'
+          it 'return new transaction info' do
+            http_request
+            expect(json).to(eql({ 'transaction' =>
+              {
+                'uuid' => '123456',
+                'type' => 'RefundTransaction',
+                'status' => 'approved',
+                'amount' => 10,
+                'customer_email' => 'cust@mail.com',
+                'customer_phone' => '123456',
+                'merchant_email' => 'merchant1@mail.com'
+              } }))
+          end
+          context 'with not using parameters' do
+            subject(:http_request) do
+              post url,
+                   params: {
+                     token: token,
+                     transaction: {
+                       uuid: 'charge123',
+                       type: 'RefundTransaction',
+                       amount: 10,
+                       customer_phone: '+797897998',
+                       customer_email: 'some_email@mail.com'
+                     }
+                   }
+            end
+            it_behaves_like 'returns 201 status'
+            it 'ignore not using parameters' do
+              http_request
+              expect(json).to(eql({ 'transaction' =>
+                {
+                  'uuid' => '123456',
+                  'type' => 'RefundTransaction',
+                  'status' => 'approved',
+                  'amount' => 10,
+                  'customer_email' => 'cust@mail.com',
+                  'customer_phone' => '123456',
+                  'merchant_email' => 'merchant1@mail.com'
+                } }))
+            end
+          end
+        end
+        context 'not present uuid' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     uuid: 'not_present',
+                     type: 'RefundTransaction',
+                     amount: -10
+                   }
+                 }
+          end
+          before do
+            charge_transaction
+          end
+          it_behaves_like 'to not change ChargeTransaction status'
+          it_behaves_like "to not change merchant's total_transaction_sum"
           it_behaves_like 'returns 404 status'
-          it_behaves_like 'not creates new transaction', ReversalTransaction.all
+          it_behaves_like 'not creates new transaction', RefundTransaction.all
           it 'return error message' do
             http_request
             expect(json).to(eql({ 'error' => 'record not present' }))
+          end
+        end
+        context 'already refunded charge_transaction' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     uuid: 'charge123',
+                     type: 'RefundTransaction',
+                     amount: 10
+                   }
+                 }
+          end
+          before do
+            charge_transaction.refund!
+          end
+          it_behaves_like 'to not change ChargeTransaction status'
+          it_behaves_like "to not change merchant's total_transaction_sum"
+          it_behaves_like 'returns 422 status'
+          it_behaves_like 'creates new transaction', RefundTransaction.all
+          it 'return error message' do
+            http_request
+            expect(json).to(eql({
+                                  'transaction' =>
+                                                {
+                                                  'uuid' => '123456',
+                                                  'type' => 'RefundTransaction',
+                                                  'status' => 'error',
+                                                  'amount' => 10,
+                                                  'customer_email' => 'cust@mail.com',
+                                                  'customer_phone' => '123456',
+                                                  'merchant_email' => 'merchant1@mail.com'
+                                                },
+                                  'error' => 'Charge transaction status of parent transaction should be approved'
+                                }))
+          end
+        end
+        context 'amount != charge transaction amount' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     uuid: 'charge123',
+                     type: 'RefundTransaction',
+                     amount: 15
+                   }
+                 }
+          end
+          before do
+            charge_transaction
+          end
+          it_behaves_like 'to not change ChargeTransaction status'
+          it_behaves_like "to not change merchant's total_transaction_sum"
+          it_behaves_like 'returns 422 status'
+          it_behaves_like 'creates new transaction', RefundTransaction.all
+          it 'return errors' do
+            http_request
+            expect(json)
+              .to(eql({
+                        'transaction' =>
+                                        {
+                                          'uuid' => '123456',
+                                          'type' => 'RefundTransaction',
+                                          'status' => 'error',
+                                          'amount' => 15,
+                                          'customer_email' => 'cust@mail.com',
+                                          'customer_phone' => '123456',
+                                          'merchant_email' => 'merchant1@mail.com'
+                                        },
+                        'error' => 'Amount amount should be equal to change transaction amount = 10'
+                      }))
           end
         end
       end

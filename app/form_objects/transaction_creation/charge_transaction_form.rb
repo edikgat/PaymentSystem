@@ -6,9 +6,14 @@ module TransactionCreation
     validates :amount,
               numericality: { greater_than: 0 },
               allow_blank: true
+    validates :authorize_transaction_status,
+              inclusion: { in: [:approved], message: :status_should_be_approved },
+              if: :authorize_transaction
+
     validate :less_than_or_equal_to_remaining_balance
 
     delegate :amount, to: :payment_transaction
+    delegate :status, to: :authorize_transaction, prefix: true
 
     def process_success
       merchant.total_transaction_sum += payment_transaction.amount
@@ -32,7 +37,7 @@ module TransactionCreation
     end
 
     def authorize_transaction
-      @authorize_transaction ||= merchant.approved_authorize_transactions
+      @authorize_transaction ||= merchant.authorize_transactions
                                          .find_by!(uuid: params[:uuid])
     end
 

@@ -34,3 +34,5 @@ en:
     messages:
       invalid_email: 'has incorrect email format'
       sum_less_than_or_equal_blocked_amount: 'sum of change should be less than or equal to users blocked amount = %{count}'
+      amount_should_be_equal_to_charge_transaction_amount: 'amount should be equal to change transaction amount = %{count}'
+      status_should_be_approved: 'of parent transaction should be approved'

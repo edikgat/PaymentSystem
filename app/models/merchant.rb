@@ -4,13 +4,11 @@ class Merchant < ApplicationRecord
   STATUSES = %i[active inactive].freeze
 
   has_many :payment_transactions, inverse_of: :merchant
-  has_many :approved_authorize_transactions,
-           -> { where(status: :approved) },
+  has_many :authorize_transactions,
            class_name: 'AuthorizeTransaction',
            inverse_of: :merchant
 
-  has_many :approved_charge_transactions,
-           -> { where(status: :approved) },
+  has_many :charge_transactions,
            class_name: 'ChargeTransaction',
            inverse_of: :merchant
 
