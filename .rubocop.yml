@@ -10,6 +10,9 @@ Layout/EmptyLinesAroundBlockBody:
   Exclude:
     - 'db/schema.rb'
 
+Style/MissingElse:
+  Enabled: false
+
 Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
 
@@ -26,13 +29,6 @@ Style/GlobalVars:
   Enabled: true
   Exclude:
     - 'config/initializers/redis.rb'
-
-Style/MissingElse:
-  Enabled: true
-  Exclude:
-    - 'config/boot.rb'
-    - 'config/environments/production.rb'
-    - 'bin/spring'
 
 Style/InlineComment:
   Enabled: true

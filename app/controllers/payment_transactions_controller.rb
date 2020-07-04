@@ -1,19 +1,15 @@
 # frozen_string_literal: true
 
 class PaymentTransactionsController < ApplicationController
-  before_action :set_payment_transaction, only: [:show]
-
   def index
-    @payment_transactions = PaymentTransaction.all
+    @payment_transactions = PaymentTransaction.all.decorate
   end
 
-  def show; end
+  def show
+    @payment_transaction = PaymentTransaction.find(params[:id]).decorate
+  end
 
   private
-
-  def set_payment_transaction
-    @payment_transaction = PaymentTransaction.find(params[:id])
-  end
 
   def payment_transaction_params
     params.require(:payment_transaction).permit(

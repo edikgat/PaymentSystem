@@ -1,0 +1,13 @@
+= simple_form_for(@merchant) do |f|
+  = f.error_notification
+  = f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present?
+  .form-inputs
+    = f.input :name
+    = f.input :description
+    = f.input :email
+    = f.input :status, as: :select, collection: [:active, :inactive]
+    = f.input :total_transaction_sum
+    = f.input :password
+    = f.input :password_confirmation
+  .form-actions
+    = f.button :submit

@@ -38,6 +38,10 @@ GEM
       globalid (>= 0.3.6)
     activemodel (5.2.4.3)
       activesupport (= 5.2.4.3)
+    activemodel-serializers-xml (1.0.2)
+      activemodel (> 5.x)
+      activesupport (> 5.x)
+      builder (~> 3.1)
     activerecord (5.2.4.3)
       activemodel (= 5.2.4.3)
       activesupport (= 5.2.4.3)
@@ -84,6 +88,12 @@ GEM
       responders
       warden (~> 1.2.3)
     diff-lcs (1.4.2)
+    draper (4.0.1)
+      actionpack (>= 5.0)
+      activemodel (>= 5.0)
+      activemodel-serializers-xml (>= 1.0)
+      activesupport (>= 5.0)
+      request_store (>= 1.0)
     dry-configurable (0.11.6)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.4, >= 0.4.7)
@@ -224,6 +234,8 @@ GEM
     redis (3.3.5)
     redis-namespace (1.7.0)
       redis (>= 3.0.4)
+    request_store (1.5.0)
+      rack (>= 1.4)
     responders (3.0.1)
       actionpack (>= 5.0)
       railties (>= 5.0)
@@ -280,6 +292,13 @@ GEM
     simple_form (5.0.2)
       actionpack (>= 5.0)
       activemodel (>= 5.0)
+    slim (4.1.0)
+      temple (>= 0.7.6, < 0.9)
+      tilt (>= 2.0.6, < 2.1)
+    slim-rails (3.2.0)
+      actionpack (>= 3.1)
+      railties (>= 3.1)
+      slim (>= 3.0, < 5.0)
     spring (2.1.0)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
@@ -292,6 +311,7 @@ GEM
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
     state_machine (1.2.0)
+    temple (0.8.2)
     thor (1.0.1)
     thread_safe (0.3.6)
     tilt (2.0.10)
@@ -327,6 +347,7 @@ DEPENDENCIES
   coffee-rails (~> 4.2)
   database_cleaner
   devise
+  draper
   factory_bot_rails
   faker
   grape
@@ -354,6 +375,7 @@ DEPENDENCIES
   sassc-rails (>= 2.1.0)
   shoulda-matchers
   simple_form (~> 5.0.0)
+  slim-rails
   spring
   spring-watcher-listen (~> 2.0.0)
   state_machine

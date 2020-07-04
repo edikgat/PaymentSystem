@@ -1,0 +1,24 @@
+.page-header
+  h1 Listing Transactions
+.table-responsive
+  table.table.table-striped.table-bordered.table-hover
+    thead
+      tr
+        th Uuid
+        th Merchant
+        th Status
+        th Type
+        th Amount
+        th Customer email
+        th Customer phone
+        th
+    tbody
+      = content_tag_for(:tr, @payment_transactions) do |payment_transaction|
+        td= link_to(payment_transaction.uuid, merchant_path(payment_transaction.merchant))
+        td= link_to(payment_transaction.merchant_name, merchant_path(payment_transaction.merchant))
+        td= payment_transaction.status
+        td= payment_transaction.type
+        td= payment_transaction.amount
+        td= payment_transaction.customer_email
+        td= payment_transaction.customer_phone
+        td= link_to 'Show', payment_transaction_path(payment_transaction)
