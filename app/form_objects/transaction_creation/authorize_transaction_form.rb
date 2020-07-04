@@ -10,7 +10,7 @@ module TransactionCreation
               numericality: { greater_than: 0 },
               allow_blank: true
 
-    delegate :customer_email, :customer_phone, :amount, :persisted?, to: :payment_transaction
+    delegate :customer_email, :customer_phone, :amount, to: :payment_transaction
 
     def process_success; end
 

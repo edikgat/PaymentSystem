@@ -202,6 +202,12 @@ describe Api::TransactionsApi do
             .to_not(change { merchant.reload.total_transaction_sum })
         end
       end
+      shared_examples 'to not change AuthorizeTransaction status' do
+        it do
+          expect { http_request }
+            .to_not(change { authorize_transaction.reload.status })
+        end
+      end
       context 'invalid api parameters' do
         subject(:http_request) do
           post url,
@@ -309,6 +315,7 @@ describe Api::TransactionsApi do
             expect { http_request }
               .to(change { merchant.reload.total_transaction_sum }.by(5))
           end
+          it_behaves_like 'to not change AuthorizeTransaction status'
           it_behaves_like 'creates new transaction', ChargeTransaction.all
           it_behaves_like 'returns 201 status'
           it 'return new transaction info' do
@@ -324,8 +331,36 @@ describe Api::TransactionsApi do
                 'merchant_email' => 'merchant1@mail.com'
               } }))
           end
+          context 'with not using parameters' do
+            subject(:http_request) do
+              post url,
+                   params: {
+                     token: token,
+                     transaction: {
+                       uuid: 'auth123',
+                       type: 'ChargeTransaction',
+                       amount: 5,
+                       customer_phone: '+797897998',
+                       customer_email: 'some_email@mail.com'
+                     }
+                   }
+            end
+            it_behaves_like 'returns 201 status'
+            it 'ignore not using parameters' do
+              http_request
+              expect(json).to(eql({ 'transaction' =>
+                {
+                  'uuid' => '123456',
+                  'type' => 'ChargeTransaction',
+                  'status' => 'approved',
+                  'amount' => 5,
+                  'customer_email' => 'cust@mail.com',
+                  'customer_phone' => '123456',
+                  'merchant_email' => 'merchant1@mail.com'
+                } }))
+            end
+          end
         end
-
         context 'not present uuid' do
           subject(:http_request) do
             post url,
@@ -349,7 +384,30 @@ describe Api::TransactionsApi do
             expect(json).to(eql({ 'error' => 'record not present' }))
           end
         end
-        context '> auth amount' do
+        context 'already reversed authorize_transaction' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     uuid: 'auth123',
+                     type: 'ChargeTransaction',
+                     amount: 5
+                   }
+                 }
+          end
+          before do
+            authorize_transaction.reverse!
+          end
+          it_behaves_like "to not change merchant's total_transaction_sum"
+          it_behaves_like 'returns 404 status'
+          it_behaves_like 'not creates new transaction', ChargeTransaction.all
+          it 'return error message' do
+            http_request
+            expect(json).to(eql({ 'error' => 'record not present' }))
+          end
+        end
+        context "total > authorize transaction's amount" do
           subject(:http_request) do
             post url,
                  params: {
@@ -418,6 +476,125 @@ describe Api::TransactionsApi do
                                     },
                                   'error' => 'Amount must be greater than 0'
                                 }))
+          end
+        end
+      end
+      context 'ReversalTransaction' do
+        let(:authorize_transaction) do
+          create(
+            :authorize_transaction,
+            uuid: 'auth123',
+            amount: 10.0,
+            merchant: merchant,
+            customer_phone: '123456',
+            customer_email: 'cust@mail.com'
+          )
+        end
+        context 'all parameters valid' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     uuid: 'auth123',
+                     type: 'ReversalTransaction'
+                   }
+                 }
+          end
+          before do
+            authorize_transaction
+          end
+          it 'change AuthorizeTransaction status to reversed' do
+            expect { http_request }
+              .to(change { authorize_transaction.reload.status }.from(:approved).to(:reversed))
+          end
+          it_behaves_like "to not change merchant's total_transaction_sum"
+          it_behaves_like 'creates new transaction', ReversalTransaction.all
+          it_behaves_like 'returns 201 status'
+          it 'return new transaction info' do
+            http_request
+            expect(json).to(eql({ 'transaction' =>
+              {
+                'uuid' => '123456',
+                'type' => 'ReversalTransaction',
+                'status' => 'approved',
+                'customer_email' => 'cust@mail.com',
+                'customer_phone' => '123456',
+                'merchant_email' => 'merchant1@mail.com'
+              } }))
+          end
+          context 'with not using parameters' do
+            subject(:http_request) do
+              post url,
+                   params: {
+                     token: token,
+                     transaction: {
+                       uuid: 'auth123',
+                       type: 'ReversalTransaction',
+                       customer_phone: '+797897998',
+                       customer_email: 'notValidEmail',
+                       amount: 100_000_000
+                     }
+                   }
+            end
+            it_behaves_like 'returns 201 status'
+            it 'ignore not using parameters' do
+              http_request
+              expect(json).to(eql({ 'transaction' =>
+                {
+                  'uuid' => '123456',
+                  'type' => 'ReversalTransaction',
+                  'status' => 'approved',
+                  'customer_email' => 'cust@mail.com',
+                  'customer_phone' => '123456',
+                  'merchant_email' => 'merchant1@mail.com'
+                } }))
+            end
+          end
+        end
+        context 'not present uuid' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     uuid: 'not_present',
+                     type: 'ReversalTransaction'
+                   }
+                 }
+          end
+          before do
+            authorize_transaction
+          end
+          it_behaves_like 'to not change AuthorizeTransaction status'
+          it_behaves_like "to not change merchant's total_transaction_sum"
+          it_behaves_like 'returns 404 status'
+          it_behaves_like 'not creates new transaction', ReversalTransaction.all
+          it 'return error message' do
+            http_request
+            expect(json).to(eql({ 'error' => 'record not present' }))
+          end
+        end
+        context 'already reversed authorize_transaction' do
+          subject(:http_request) do
+            post url,
+                 params: {
+                   token: token,
+                   transaction: {
+                     uuid: 'auth123',
+                     type: 'ReversalTransaction'
+                   }
+                 }
+          end
+          before do
+            authorize_transaction.reverse!
+          end
+          it_behaves_like "to not change merchant's total_transaction_sum"
+          it_behaves_like 'returns 404 status'
+          it_behaves_like 'not creates new transaction', ReversalTransaction.all
+          it 'return error message' do
+            http_request
+            expect(json).to(eql({ 'error' => 'record not present' }))
           end
         end
       end

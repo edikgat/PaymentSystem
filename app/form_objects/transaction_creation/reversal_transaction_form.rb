@@ -2,6 +2,10 @@
 
 module TransactionCreation
   class ReversalTransactionForm < BaseForm
+    def process_success
+      authorize_transaction.reverse!
+    end
+
     private
 
     def build_payment_transaction
@@ -19,8 +23,7 @@ module TransactionCreation
     end
 
     def authorize_transaction
-      @authorize_transaction ||= merchant.payment_transactions
-                                         .approved.where(type: :AuthorizeTransaction)
+      @authorize_transaction ||= merchant.approved_authorize_transactions
                                          .find_by!(uuid: params[:uuid])
     end
   end

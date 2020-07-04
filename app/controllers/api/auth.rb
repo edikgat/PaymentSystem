@@ -6,7 +6,7 @@ module Api
     prefix 'api'
 
     resource :token do
-      desc 'Authenticate'
+      desc 'LogIn'
       params do
         requires :merchant, type: Hash do
           optional :email, type: String

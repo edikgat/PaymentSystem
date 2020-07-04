@@ -8,7 +8,7 @@ module TransactionCreation
               allow_blank: true
     validate :less_than_or_equal_to_remaining_balance
 
-    delegate :amount, :persisted?, to: :payment_transaction
+    delegate :amount, to: :payment_transaction
 
     def process_success
       merchant.total_transaction_sum += payment_transaction.amount
@@ -32,8 +32,7 @@ module TransactionCreation
     end
 
     def authorize_transaction
-      @authorize_transaction ||= merchant.payment_transactions
-                                         .approved.where(type: :AuthorizeTransaction)
+      @authorize_transaction ||= merchant.approved_authorize_transactions
                                          .find_by!(uuid: params[:uuid])
     end
 

@@ -6,6 +6,7 @@ module TransactionCreation
 
     attr_reader :payment_transaction, :merchant, :params
 
+    delegate :persisted?, to: :payment_transaction
     def initialize(params, merchant)
       @merchant = merchant
       @params = params
