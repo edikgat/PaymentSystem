@@ -48,7 +48,6 @@ group :development, :test do
 end
 
 group :test do
-  gem 'simplecov', require: false
   gem 'capybara'
   gem 'capybara-screenshot'
   gem 'database_cleaner-active_record'
@@ -57,12 +56,13 @@ group :test do
   gem 'rspec-rails'
   gem 'selenium-webdriver'
   gem 'shoulda-matchers'
+  gem 'simplecov', require: false
   gem 'webdrivers', '~> 4.0'
 end
 
 group :development do
-  gem 'rubocop', '~> 0.51.0', require: false
   gem 'brakeman'
+  gem 'rubocop', '~> 0.51.0', require: false
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'web-console', '>= 3.3.0'
