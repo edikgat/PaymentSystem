@@ -48,7 +48,7 @@ group :development, :test do
 end
 
 group :test do
-  # gem 'simplecov', require: false
+  gem 'simplecov', require: false
   gem 'capybara'
   gem 'capybara-screenshot'
   gem 'database_cleaner-active_record'
