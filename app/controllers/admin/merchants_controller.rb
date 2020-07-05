@@ -4,7 +4,7 @@ class Admin
   class MerchantsController < BaseController
     before_action :set_merchant, only: %i[show edit update destroy]
     def index
-      @merchants = Merchant.all
+      @merchants = Merchant.all.decorate
     end
 
     def show; end
@@ -55,7 +55,7 @@ class Admin
     private
 
     def set_merchant
-      @merchant = Merchant.find(params[:id])
+      @merchant = Merchant.find(params[:id]).decorate
     end
 
     def merchant_params

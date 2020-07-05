@@ -27,6 +27,7 @@ html
               li= link_to('Merchant', new_merchant_session_path)
             - if merchant_signed_in?
               li= link_to('Transactions', merchant_payment_transactions_path)
+              li= link_to("Total Profit: #{current_merchant.total_profit}", merchant_payment_transactions_path)
             - if admin_signed_in?
               li= link_to('Merchants', admin_merchants_path)
               li= link_to('Transactions', admin_payment_transactions_path)

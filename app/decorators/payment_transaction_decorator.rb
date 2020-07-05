@@ -15,4 +15,8 @@ class PaymentTransactionDecorator < ApplicationDecorator
       object.authorize_transaction
     end
   end
+
+  def amount
+    "$#{object.amount}" if object.amount.present?
+  end
 end

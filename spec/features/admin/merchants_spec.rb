@@ -36,12 +36,12 @@ describe 'Admin Merchants' do
       expect(page).to(have_selector('td', text: 'name_string'))
       expect(page).to(have_selector('td', text: 'active'))
       expect(page).to(have_selector('td', text: 'description_text'))
-      expect(page).to(have_selector('td', text: '321'))
+      expect(page).to(have_selector('td', text: '$321'))
       expect(page).to(have_selector('td', text: 'other_email@mail.com'))
       expect(page).to(have_selector('td', text: 'name_string_other'))
       expect(page).to(have_selector('td', text: 'inactive'))
       expect(page).to(have_selector('td', text: 'description_text_other'))
-      expect(page).to(have_selector('td', text: '123'))
+      expect(page).to(have_selector('td', text: '$123'))
     end
   end
 
