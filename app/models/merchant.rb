@@ -15,6 +15,7 @@ class Merchant < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
 
   validates :email, presence: true
+  validates :name, presence: true
   validates :password, :password_confirmation, presence: true, on: :create
   validates :password, confirmation: true
   validates :email, uniqueness: { case_sensitive: false }, email: true, allow_blank: true

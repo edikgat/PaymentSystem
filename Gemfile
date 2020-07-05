@@ -56,6 +56,7 @@ gem('jwt')
 gem('redis', '~>3.2')
 gem('redis-namespace')
 gem('slim-rails')
+gem('smarter_csv')
 gem('state_machine')
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
