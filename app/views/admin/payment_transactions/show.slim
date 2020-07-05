@@ -1,5 +1,5 @@
 .page-header
-  = link_to payment_transactions_path, class: 'btn btn-default' do
+  = link_to admin_payment_transactions_path, class: 'btn btn-default' do
     span.glyphicon.glyphicon-list-alt
     | Back
   h1 Show Transaction
@@ -8,10 +8,10 @@ dl.dl-horizontal
   dd= @payment_transaction.uuid
   - if @payment_transaction.merchant
     dt Merchant:
-    dd= link_to(@payment_transaction.merchant_name, merchant_path(@payment_transaction.merchant))
+    dd= link_to(@payment_transaction.merchant_name, admin_merchant_path(@payment_transaction.merchant))
   - if @payment_transaction.parent_payment_transaction
     dt Parent transaction:
-    dd= link_to(@payment_transaction.parent_payment_transaction_uuid, payment_transaction_path(@payment_transaction.parent_payment_transaction))
+    dd= link_to(@payment_transaction.parent_payment_transaction_uuid, admin_payment_transaction_path(@payment_transaction.parent_payment_transaction))
   dt Status:
   dd= @payment_transaction.status
   dt Type:

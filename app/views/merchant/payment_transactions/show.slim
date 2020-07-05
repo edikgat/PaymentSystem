@@ -1,0 +1,21 @@
+.page-header
+  = link_to merchant_payment_transactions_path, class: 'btn btn-default' do
+    span.glyphicon.glyphicon-list-alt
+    | Back
+  h1 Show Transaction
+dl.dl-horizontal
+  dt Uuid:
+  dd= @payment_transaction.uuid
+  - if @payment_transaction.parent_payment_transaction
+    dt Parent transaction:
+    dd= link_to(@payment_transaction.parent_payment_transaction_uuid, merchant_payment_transaction_path(@payment_transaction.parent_payment_transaction))
+  dt Status:
+  dd= @payment_transaction.status
+  dt Type:
+  dd= @payment_transaction.type
+  dt Amount:
+  dd= @payment_transaction.amount
+  dt Customer email:
+  dd= @payment_transaction.customer_email
+  dt Customer phone:
+  dd= @payment_transaction.customer_phone

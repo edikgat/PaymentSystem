@@ -10,9 +10,13 @@ class CreateMerchants < ActiveRecord::Migration[5.2]
       t.decimal(:total_transaction_sum, null: false, default: 0.0)
       t.string(:encrypted_password, null: false, default: '')
       t.bigint(:lock_version, null: false)
-      t.timestamps
+      t.string(:reset_password_token)
+      t.datetime(:reset_password_sent_at)
+      t.datetime(:remember_created_at)
+      t.timestamps(null: false)
     end
 
     add_index(:merchants, :email, unique: true)
+    add_index(:merchants, :reset_password_token, unique: true)
   end
 end

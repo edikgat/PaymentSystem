@@ -23,7 +23,10 @@ class Merchant < ApplicationRecord
             numericality: { greater_than_or_equal_to: 0 },
             allow_blank: true
 
-  devise :database_authenticatable
+  devise :database_authenticatable,
+         :recoverable,
+         :rememberable,
+         :validatable
 
   scope :active, -> { where(status: :active) }
 end

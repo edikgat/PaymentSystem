@@ -14,11 +14,11 @@
         th
     tbody
       = content_tag_for(:tr, @payment_transactions) do |payment_transaction|
-        td= link_to(payment_transaction.uuid, merchant_path(payment_transaction.merchant))
-        td= link_to(payment_transaction.merchant_name, merchant_path(payment_transaction.merchant))
+        td= link_to(payment_transaction.uuid, admin_payment_transaction_path(payment_transaction.merchant))
+        td= link_to(payment_transaction.merchant_name, admin_merchant_path(payment_transaction.merchant))
         td= payment_transaction.status
         td= payment_transaction.type
         td= payment_transaction.amount
         td= payment_transaction.customer_email
         td= payment_transaction.customer_phone
-        td= link_to 'Show', payment_transaction_path(payment_transaction)
+        td= link_to 'Show', admin_payment_transaction_path(payment_transaction)

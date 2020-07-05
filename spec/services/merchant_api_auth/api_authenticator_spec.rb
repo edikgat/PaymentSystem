@@ -8,7 +8,7 @@ RSpec.describe(MerchantApiAuth::Authenticator) do
   let(:secret_key) { Rails.application.secrets.secret_key_base.to_s }
   let(:current_time) { Time.utc(2016, 8, 1, 13, 30) }
   let(:decoded_payload) { JWT.decode(token, secret_key, 'HS256') }
-  let!(:resource) { create(:merchant, id: 123) }
+  let!(:resource) { create(:merchant, id: 123, email: 'merchant@mail.com') }
   before do
     Timecop.freeze(current_time)
   end
@@ -26,7 +26,7 @@ RSpec.describe(MerchantApiAuth::Authenticator) do
       end
     end
     context 'merchant inactive' do
-      let!(:resource) { create(:merchant, id: 123, status: :inactive) }
+      let!(:resource) { create(:merchant, id: 123, status: :inactive, email: 'merchant@merchant.com') }
       it 'return false' do
         expect(authenticator.resource).to(eql(false))
       end

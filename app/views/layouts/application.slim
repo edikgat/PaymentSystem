@@ -15,27 +15,31 @@ html
     = javascript_include_tag 'application', 'data-turbolinks-track' => true
     = csrf_meta_tags
   body
-    nav.navbar.navbar-inverse.navbar-fixed-top role="navigation" 
+    nav.navbar.navbar-inverse.navbar-fixed-top role="navigation"
       .container
         .navbar-header
-          button.navbar-toggle.collapsed aria-controls="navbar" aria-expanded="false" data-target="#navbar" data-toggle="collapse" type="button" 
-            span.sr-only Toggle navigation
-            span.icon-bar
-            span.icon-bar
-            span.icon-bar
-          = link_to "PaymentSystem", root_path, class: "navbar-brand"
+          = link_to "PaymentSystem", merchant_signed_in? ? merchant_payment_transactions_path : admin_payment_transactions_path, class: "navbar-brand"
         #navbar.collapse.navbar-collapse
           ul.nav.navbar-nav
-            li= link_to('Merchants', merchants_path)
-            li= link_to('Transactions', payment_transactions_path)
             li= link_to('API Documentation', '/documentation')
+            - if !merchant_signed_in? && !admin_signed_in?
+              li= link_to('Admin', new_admin_session_path)
+              li= link_to('Merchant', new_merchant_session_path)
+            - if merchant_signed_in?
+              li= link_to('Transactions', merchant_payment_transactions_path)
+            - if admin_signed_in?
+              li= link_to('Merchants', admin_merchants_path)
+              li= link_to('Transactions', admin_payment_transactions_path)
           - if admin_signed_in?
+            ul.nav.navbar-nav.pull-right
+              li= link_to('Logout', destroy_admin_session_path, method: :delete)
+          - if merchant_signed_in?
             ul.nav.navbar-nav.pull-right
               li= link_to('Logout', destroy_admin_session_path, method: :delete)
     .container
       - flash.each do |name, msg|
         = content_tag :div, class: "alert alert-#{ name == :error ? "danger" : "success" } alert-dismissable", role: "alert" do
-          button.close data-dismiss="alert" type="button" 
+          button.close data-dismiss="alert" type="button"
             span aria-hidden="true"  ×
             span.sr-only Close
           = msg
