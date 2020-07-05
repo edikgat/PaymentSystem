@@ -60,16 +60,24 @@ gem('state_machine')
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
-  gem 'database_cleaner'
   gem 'factory_bot_rails'
   gem 'faker'
   gem 'grape_on_rails_routes'
-  gem 'mocha', '0.14.0', require: false
   gem 'pry-rails'
+  gem 'timecop'
+end
+
+group :test do
+  # gem 'simplecov', require: false
+  gem 'capybara'
+  gem 'capybara-screenshot'
+  gem 'database_cleaner-active_record'
+  gem 'mocha', '0.14.0', require: false
   gem 'rspec-collection_matchers'
   gem 'rspec-rails'
+  gem 'selenium-webdriver'
   gem 'shoulda-matchers'
-  gem 'timecop'
+  gem 'webdrivers', '~> 4.0'
 end
 
 group :development do

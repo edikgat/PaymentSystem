@@ -62,6 +62,7 @@ Style/StringHashKeys:
   Exclude:
     - 'db/schema.rb'
     - 'spec/**/*'
+    - 'config/environments/*'
 
 Style/Documentation:
   Enabled: false

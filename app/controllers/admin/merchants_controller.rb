@@ -17,7 +17,6 @@ class Admin
 
     def create
       @merchant = Merchant.new(merchant_params)
-
       respond_to do |format|
         if @merchant.save
           format.html { redirect_to admin_merchant_path(@merchant), notice: 'Merchant was successfully created.' }
@@ -38,9 +37,18 @@ class Admin
     end
 
     def destroy
-      @merchant.destroy
       respond_to do |format|
-        format.html { redirect_to admin_merchants_url, notice: 'Merchant was successfully destroyed.' }
+        if @merchant.allow_destroy?
+          @merchant.destroy
+          format.html { redirect_to(admin_merchants_path, notice: 'Merchant was successfully destroyed.') }
+        else
+          format.html do
+            redirect_to(
+              admin_merchants_path,
+              notice: 'Merchant should not have transactions, to be destroyed.'
+            )
+          end
+        end
       end
     end
 
@@ -56,7 +64,6 @@ class Admin
         :description,
         :email,
         :status,
-        :total_transaction_sum,
         :password_confirmation,
         :password
       )

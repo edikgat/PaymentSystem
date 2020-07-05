@@ -35,6 +35,7 @@ ActiveRecord::Schema.define(version: 2020_06_28_170531) do
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
+    t.integer "payment_transactions_count", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_merchants_on_email", unique: true

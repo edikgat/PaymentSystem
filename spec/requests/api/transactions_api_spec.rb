@@ -196,6 +196,10 @@ describe Api::TransactionsApi do
           expect { http_request }
             .to(change { transaction_scope.reload.count }.by(1))
         end
+        it do
+          expect { http_request }
+            .to(change { merchant.reload.payment_transactions_count }.by(1))
+        end
       end
       shared_examples "to not change merchant's total_transaction_sum" do
         it do

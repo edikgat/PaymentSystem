@@ -29,4 +29,8 @@ class Merchant < ApplicationRecord
          :validatable
 
   scope :active, -> { where(status: :active) }
+
+  def allow_destroy?
+    payment_transactions_count.zero?
+  end
 end

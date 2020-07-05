@@ -4,7 +4,7 @@ class PaymentTransaction < ApplicationRecord
   TYPES = %i[AuthorizeTransaction ChargeTransaction RefundTransaction ReversalTransaction].freeze
   STATUSES = %i[approved reversed refunded error].freeze
 
-  belongs_to :merchant, inverse_of: :payment_transactions
+  belongs_to :merchant, inverse_of: :payment_transactions, counter_cache: true
 
   validates :status, inclusion: { in: STATUSES }
   validates :type, inclusion: { in: TYPES }
