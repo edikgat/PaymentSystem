@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require('sidekiq/web')
+require('sidekiq-scheduler/web')
+
 Rails.application.routes.draw do
   devise_for :admins
   devise_for :merchants
@@ -13,4 +16,5 @@ Rails.application.routes.draw do
   root to: 'admin/merchants#index'
   mount GrapeSwaggerRails::Engine, at: '/documentation'
   mount Api::V1 => '/'
+  mount Sidekiq::Web => '/sidekiq'
 end

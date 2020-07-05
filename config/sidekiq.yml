@@ -1,0 +1,11 @@
+:verbose: false
+:concurrency: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+:timeout: 30
+:queues:
+  - [payment_transactions, 1]
+
+:schedule:
+  PaymentTransactionsRemovingJob:
+    cron: '0 * * * *'
+    queue: payment_transactions
+    enabled: true

@@ -22,4 +22,15 @@ FactoryBot.define do
     association :authorize_transaction, factory: :authorize_transaction
     amount { '5.00' }
   end
+
+  factory :refund_transaction, class: 'RefundTransaction', parent: :payment_transaction do
+    type { 'RefundTransaction' }
+    association :charge_transaction, factory: :charge_transaction
+    amount { '5.00' }
+  end
+
+  factory :reversal_transaction, class: 'ReversalTransaction', parent: :payment_transaction do
+    type { 'ReversalTransaction' }
+    association :authorize_transaction, factory: :authorize_transaction
+  end
 end

@@ -6,7 +6,8 @@ class ChargeTransaction < PaymentTransaction
              foreign_key: :parent_payment_transaction_id
   has_many :refund_transactions,
            inverse_of: :charge_transaction,
-           foreign_key: :parent_payment_transaction_id
+           foreign_key: :parent_payment_transaction_id,
+           dependent: :destroy
 
   validates :status, inclusion: { in: %i[approved refunded error].freeze }
 

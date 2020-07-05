@@ -22,6 +22,7 @@ html
         #navbar.collapse.navbar-collapse
           ul.nav.navbar-nav
             li= link_to('API Documentation', '/documentation')
+            li= link_to('Sidekiq', '/sidekiq')
             - if !merchant_signed_in? && !admin_signed_in?
               li= link_to('Admin', new_admin_session_path)
               li= link_to('Merchant', new_merchant_session_path)
